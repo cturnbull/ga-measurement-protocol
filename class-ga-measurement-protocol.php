@@ -470,6 +470,23 @@ class Pilau_GA_Measurement_Protocol {
 				'cid'	=> $this->parse_cookie(),
 			);
 
+			// Support for custom dimensions. Optionally pass a 'cd' array in $info, of which each element has the CD index and value
+			if ( !empty( $info['cd'] && is_array( $info['cd'] ) ) ) {
+				foreach( $info['cd'] as $index => $value ) {
+					if ( is_int( $index ) && $index >= 1 && $index <= 200 ) {
+						$standard_params["cd$index"] = $value;
+					}
+				}
+			}
+			// Support for custom metrics. Optionally pass a 'cm' array in $info, similarly to CD support
+			if ( !empty( $info['cm'] && is_array( $info['cm'] ) ) ) {
+				foreach( $info['cm'] as $index => $value ) {
+					if ( is_int( $index ) && $index >= 1 && $index <= 200 ) {
+						$standard_params["cm$index"] = $value;
+					}
+				}
+			}
+
 			if ( $method === 'pageview' ) {
 
 				// Send PageView hit
@@ -536,22 +553,6 @@ class Pilau_GA_Measurement_Protocol {
 				}
 				if ( isset( $info['value'] ) && $info['value'] ) {
 					$event_params['ev'] = $info['value'];
-				}
-				// Support for custom dimensions. Optionally pass a 'cd' array in $info, of which each element has the CD index and value
-				if ( !empty( $info['cd'] && is_array( $info['cd'] ) ) ) {
-					foreach( $info['cd'] as $index => $value ) {
-						if ( is_int( $index ) && $index >= 1 && $index <= 200 ) {
-							$event_params["cd$index"] = $value;
-						}
-					}
-				}
-				// Support for custom metrics. Optionally pass a 'cm' array in $info, similarly to CD support
-				if ( !empty( $info['cm'] && is_array( $info['cm'] ) ) ) {
-					foreach( $info['cm'] as $index => $value ) {
-						if ( is_int( $index ) && $index >= 1 && $index <= 200 ) {
-							$event_params["cm$index"] = $value;
-						}
-					}
 				}
 
 				$data = array_merge( $standard_params, $event_params );
